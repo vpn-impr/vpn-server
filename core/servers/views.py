@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from outline_api.prometheus import headers
 from rest_framework.response import Response
 from core.servers.models import OutlineServerKey
 from rest_framework.renderers import JSONRenderer
@@ -35,8 +36,7 @@ class GetConfigByKeyViewSet(APIView):
                 return Response(status=304)
 
             # Возвращаем ответ с ETag
-            response = Response(data)
-            response['ETag'] = etag
+            response = Response(data, headers={'ETag': etag})
             return response
         except:
             return Response({"status": False})
