@@ -20,8 +20,32 @@ CSRF_TRUSTED_ORIGINS = [
     host.strip() for host in getenv("CSRF_TRUSTED_ORIGINS", "http://localhost").split(",")
 ]
 
-CORS_ALLOW_ALL_ORIGINS = getenv("CORS_ALLOW_ALL_ORIGINS", "False").lower() == "true"
-CORS_ALLOW_CREDENTIALS = getenv("CORS_ALLOW_CREDENTIALS", "False").lower() == "true"
+CORS_ALLOW_ALL_ORIGINS = getenv("CORS_ALLOW_ALL_ORIGINS", "true").lower() == "true"
+CORS_ALLOW_CREDENTIALS = getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 CORS_ALLOWED_ORIGINS = getenv("CORS_ALLOWED_ORIGINS", "http://localhost").split(
     ",",
 )
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+    "HEAD"
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "origin",
+    "dnt",
+    "user-agent",
+    "x-csrftoken",
+    "csrftoken",
+    "x-requested-with",
+    "organisation-slug",
+    "access-control-allow-origin"
+]
