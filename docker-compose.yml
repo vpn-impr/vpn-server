@@ -88,12 +88,6 @@ services:
       - traefik.http.routers.backend.entrypoints=web-secure
       - traefik.http.routers.backend.priority=50
       - traefik.http.routers.backend.rule=Host(`s1.${DOMAIN:?Domain required}`)
-      - traefik.http.middlewares.cors-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,POST
-      - traefik.http.middlewares.cors-headers.headers.accessControlAllowHeaders=Content-Type,Authorization
-      - traefik.http.middlewares.cors-headers.headers.accessControlAllowOrigin=*
-      - traefik.http.middlewares.cors-headers.headers.accessControlAllowCredentials=true
-      - traefik.http.middlewares.cors-headers.headers.accessControlMaxAge=100
-      - traefik.http.routers.backend.middlewares=cors-headers
   bot:
     build: .
     command: python -m bot
