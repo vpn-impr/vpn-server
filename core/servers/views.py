@@ -2,6 +2,9 @@ from rest_framework.response import Response
 from core.servers.models import OutlineServerKey
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
+import logging
+
+logger = logging.getLogger(__name__)
 
 class GetConfigByKeyViewSet(APIView):
     renderer_classes = [JSONRenderer]
@@ -16,8 +19,8 @@ class GetConfigByKeyViewSet(APIView):
                 "password": server_key.password,
                 "method": server_key.method
             }
-            print(data)
+            logger.info(str(data))
             return Response(data)
         except:
-            print({"status": False})
+            logger.info(str({"status": False}))
             return Response({"status": False})
