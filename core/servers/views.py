@@ -37,6 +37,6 @@ class GetConfigByKeyViewSet(APIView):
             # Возвращаем ответ с ETag
             response = Response(data)
             response['ETag'] = etag
-            return Response(data)
+            return response
         except:
             return Response({"status": False})
