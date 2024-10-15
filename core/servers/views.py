@@ -11,9 +11,8 @@ class GetConfigByKeyViewSet(APIView):
             key = request.query_params.get("key")
             server_key = OutlineServerKey.objects.filter(id=key).first()
             data = {
-                "status": True,
                 "server": server_key.server.host,
-                "server_port": server_key.port,
+                "server_port": int(server_key.port),
                 "password": server_key.password,
                 "method": server_key.method
             }
