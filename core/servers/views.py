@@ -16,6 +16,8 @@ class GetConfigByKeyViewSet(APIView):
                 "password": server_key.password,
                 "method": server_key.method
             }
+            print(data)
             return Response(data)
         except:
+            print({"status": False})
             return Response({"status": False})

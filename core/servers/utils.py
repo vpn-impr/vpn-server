@@ -129,4 +129,4 @@ async def change_user_city(user, city):
     return True, outline_server_key
 
 async def get_ssconf(server_key):
-    return f'ssconf://s1.{settings.DOMAIN}/config/?key={server_key.id} InterVPN'
+    return f'ssconf://s1.{settings.DOMAIN}/config/?key={server_key.id}'
