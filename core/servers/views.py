@@ -13,7 +13,7 @@ class GetConfigByKeyViewSet(APIView):
             data = {
                 "status": True,
                 "server": server_key.server.host,
-                "server_port": server_key.server.port,
+                "server_port": server_key.port,
                 "password": server_key.password,
                 "method": server_key.method
             }

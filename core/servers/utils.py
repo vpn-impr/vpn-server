@@ -89,6 +89,7 @@ def create_new_server_key(server):
         access_key=new_key.access_url,
         password=new_key.password,
         method=new_key.method,
+        port=new_key.port,
         server=server
     )
     return server_key

@@ -84,6 +84,7 @@ class OutlineServerKey(models.Model):
     access_key = models.CharField(max_length=10000)
     password = models.CharField(max_length=10000, default='None')
     method = models.CharField(max_length=10000, default='None')
+    port = models.CharField(max_length=10000, default='None')
     server = models.ForeignKey(OutlineServer, on_delete=models.PROTECT)
 
     created_at = models.DateTimeField(auto_now_add=True)
