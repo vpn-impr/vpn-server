@@ -22,21 +22,6 @@ class GetConfigByKeyViewSet(APIView):
                 "password": server_key.password,
                 "method": server_key.method
             }
-            # Преобразуем данные ответа в строку для хеширования
-            content_str = str(data).encode('utf-8')
-
-            # Создаем хеш для ETag
-            etag = hashlib.md5(content_str).hexdigest()
-
-            # Проверяем, отправлял ли клиент заголовок If-None-Match
-            if_none_match = request.headers.get('If-None-Match')
-
-            if if_none_match == etag:
-                # Возвращаем 304 Not Modified, если ETag совпадает
-                return Response(status=304)
-
-            # Возвращаем ответ с ETag
-            response = Response(data, headers={'ETag': etag})
-            return response
+            return JsonResponse(data, status=200)
         except:
-            return Response({"status": False})
+            return JsonResponse({"status": False}, status=200)
