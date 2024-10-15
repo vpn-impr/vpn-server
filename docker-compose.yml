@@ -27,7 +27,7 @@ services:
     command:
       - --global.sendAnonymousUsage=false
       - --api.dashboard=true
-      - --experimental.http3=true
+      - --experimental.http3=false
       - --providers.docker
       - --providers.docker.exposedByDefault=false
       - --providers.docker.endpoint=tcp://socket-proxy:2375
