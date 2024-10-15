@@ -27,7 +27,6 @@ services:
     command:
       - --global.sendAnonymousUsage=false
       - --api.dashboard=true
-      - --experimental.http3=false
       - --providers.docker
       - --providers.docker.exposedByDefault=false
       - --providers.docker.endpoint=tcp://socket-proxy:2375
@@ -35,8 +34,6 @@ services:
       - --entrypoints.web.address=:80
       # HTTPS
       - --entrypoints.web-secure.address=:443
-      - --entrypoints.web-secure.http3
-      - --entrypoints.web-secure.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12
       - --entrypoints.web-secure.http.middlewares=security-headers
       - --entrypoints.web-secure.http.tls.domains[0].main=${DOMAIN:?Domain required}
       - --entrypoints.web-secure.http.tls.domains[0].sans=s1.${DOMAIN:?Domain required},traefik.${DOMAIN:?Domain required}
@@ -60,9 +57,7 @@ services:
       - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
       - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
       # Middleware: security-headers
-      - traefik.http.middlewares.security-headers.headers.frameDeny=true
-      - traefik.http.middlewares.security-headers.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.security-headers.headers.browserXssFilter=true
+      -
       - traefik.http.middlewares.security-headers.headers.referrerPolicy=origin
       - traefik.http.middlewares.security-headers.headers.stsSeconds=63072000
       - traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true
@@ -94,6 +89,12 @@ services:
       - traefik.http.routers.backend.entrypoints=web-secure
       - traefik.http.routers.backend.priority=50
       - traefik.http.routers.backend.rule=Host(`s1.${DOMAIN:?Domain required}`)
+      - traefik.http.middlewares.cors-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,POST
+      - traefik.http.middlewares.cors-headers.headers.accessControlAllowHeaders=Content-Type,Authorization
+      - traefik.http.middlewares.cors-headers.headers.accessControlAllowOrigin=*
+      - traefik.http.middlewares.cors-headers.headers.accessControlAllowCredentials=true
+      - traefik.http.middlewares.cors-headers.headers.accessControlMaxAge=100
+      - traefik.http.routers.backend.middlewares=cors-headers
   bot:
     build: .
     command: python -m bot
