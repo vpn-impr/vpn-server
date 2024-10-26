@@ -32,7 +32,7 @@ class TelegramUser(models.Model):
         null=True, blank=True)
 
     subscription_expire_datetime = models.DateTimeField(blank=True, null=True)
-    subscription_price = models.DecimalField(max_digits=10, decimal_places=2, default=1000)
+    subscription_price = models.DecimalField(max_digits=10, decimal_places=2, default=500)
 
     outline_server_key = models.OneToOneField(
         OutlineServerKey, null=True, blank=True, on_delete=models.SET_NULL,

@@ -100,10 +100,10 @@ async def handle_get_access_key_callback(callback: CallbackQuery) -> None:
     if access_key is None:
         text = 'Ключ не найден'
     else:
-        text = 'Вот ваш ключ скопируйте и вставьте'
+        text = 'Ваш ключ:'
     await callback.message.answer(text)
     if access_key:
-        await callback.message.answer(access_key)
+        await callback.message.answer(f'{await get_ssconf(access_key)}')
 
 
 # Города
@@ -167,7 +167,7 @@ async def handle_get_city_callback(callback: CallbackQuery) -> None:
 
     city = await get_available_cities(callback.data.split('get_city_')[-1])
     if city is None:
-        await callback.message.answer('Данный город больше не доступен. Попробйте позже или выберете другой.')
+        await callback.message.answer('Данный город больше не доступен. Попробуйте позже или выберете другой.')
 
     status, _ = await change_user_city(user, city)
     if status:
