@@ -9,7 +9,7 @@ from core.servers.models import OutlineServerKey
 from core.utils.datetimes import get_now
 
 def get_subscription_trial_date():
-    return get_now() + timedelta(days=1)
+    return get_now() - timedelta(minutes=1)
 
 class User(AbstractUser):
     pass
