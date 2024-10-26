@@ -88,6 +88,20 @@ services:
       - traefik.http.routers.backend.entrypoints=web-secure
       - traefik.http.routers.backend.priority=50
       - traefik.http.routers.backend.rule=Host(`s1.${DOMAIN:?Domain required}`)
+  delete_expired_keys:
+    build: .
+    command: python manage.py delete_expired_keys
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    env_file:
+      - .env
+    restart: always
+    depends_on:
+      - redis
+    networks:
+      - traefik
   bot:
     build: .
     command: python -m bot
