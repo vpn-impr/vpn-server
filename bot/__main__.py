@@ -24,6 +24,7 @@ async def set_bot_commands() -> None:
     await bot.set_my_commands(
         (
             BotCommand(command="/profile", description="Мой профиль"),
+            BotCommand(command="/buy", description="Купить или Продлить подписку"),
             BotCommand(command="/setup", description="Как настроить?")
         ),
     )

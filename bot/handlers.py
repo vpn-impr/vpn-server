@@ -57,10 +57,10 @@ async def handle_buy_command(message: Message) -> None:
 
     await message.answer(
         'Тарифы\n\n'
-        f'1 Месяц: 500'
-        f'3 Месяца: 1400'
-        f'6 Месяцев: 2700'
-        f'12 Месяцев: 5100'
+        f'1 Месяц: 500 Рублей\n'
+        f'3 Месяца: 1400 Рублей\n'
+        f'6 Месяцев: 2700 Рублей\n'
+        f'12 Месяцев: 5100 Рублей'
     )
     await message.answer(
         'Чтобы купить или продлить подписку скопируйте это сообщение и отправьте @greenvpnoutline_admin\n'
@@ -82,10 +82,10 @@ async def handle_buy_callback(callback: CallbackQuery) -> None:
 
     await callback.message.answer(
         'Тарифы\n\n'
-        f'1 Месяц: 500\n'
-        f'3 Месяца: 1400\n'
-        f'6 Месяцев: 2700\n'
-        f'12 Месяцев: 5100'
+        f'1 Месяц: 500 Рублей\n'
+        f'3 Месяца: 1400 Рублей\n'
+        f'6 Месяцев: 2700 Рублей\n'
+        f'12 Месяцев: 5100 Рублей'
     )
     await callback.message.answer(
         'Чтобы купить или продлить подписку скопируйте это сообщение и отправьте @greenvpnoutline_admin\n'
