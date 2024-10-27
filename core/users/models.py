@@ -24,7 +24,8 @@ class TelegramUser(models.Model):
     username = models.CharField(
         _("username"),
         max_length=10000,
-        null=True
+        null=True,
+        blank=True
     )
     first_name = models.CharField(_("first name"), max_length=1500,
         null=True, blank=True)
