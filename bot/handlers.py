@@ -246,8 +246,8 @@ async def handle_setup_command(message: Message) -> None:
     reply_markup = await download_outline_inline_keyboard()
 
     await message.answer(
-        '<b>Как настроить Dance VPN</b>\n\n'
-        'Green VPN настраивается буквально в два-три клика.\n\n'
+        '<b>Как настроить GreenVPN</b>\n\n'
+        'GreenVPN настраивается буквально в два-три клика.\n\n'
         'Нужно скачать приложение Outline, оно есть на любой системе (Android, iOS, Windows, MacOS).\n'
         'Ссылки для скачивания мы прикрепили внизу этого сообщения.\n\n'
         'После этого мы пришлём ссылку, в которой содержится уникальный ключ. Если Outline уже установлен, то при переходе по ссылке, ключ применится автоматически и VPN заработает).\n\n'
