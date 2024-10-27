@@ -10,8 +10,7 @@ class RunningMode(str, Enum):
     LONG_POLLING = "LONG_POLLING"
     WEBHOOK = "WEBHOOK"
 
-
-TELEGRAM_API_TOKEN = "7679838052:AAGfo9ahb_e4XTUBT7s97FLy8nHOSGTXNt8"
+TELEGRAM_API_TOKEN = getenv("TELEGRAM_API_TOKEN", default="")
 
 RUNNING_MODE = RunningMode(getenv("RUNNING_MODE", default="LONG_POLLING"))
 WEBHOOK_URL = getenv("WEBHOOK_URL", default="")
