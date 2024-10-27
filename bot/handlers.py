@@ -35,12 +35,62 @@ async def handle_start_command(message: Message) -> None:
     if is_new:
         await message.answer(
             'Добро пожаловать! 🚀\n\n'
-            'При регистрации вам доступен пробный период 1 день. Далее необходимо продлить подписку\n'
+            'Чтобы купить подписку - нажмите кнопку "Оформить подписку"\n'
             'В подписке вам доступны любые локации. Сменить локацию или найти данные для подключения можно через свой профиль'
         )
     else:
         await message.answer("Здравствуйте, вы уже зарегистрированы.")
     await handle_profile_command(message)
+
+#Купить
+@router.message(Command(commands=["buy"]))
+async def handle_buy_command(message: Message) -> None:
+    if message.from_user is None:
+        return
+
+    user, is_new = await get_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
+    await message.answer(
+        'Тарифы\n\n'
+        f'1 Месяц: 500'
+        f'3 Месяца: 1400'
+        f'6 Месяцев: 2700'
+        f'12 Месяцев: 5100'
+    )
+    await message.answer(
+        'Чтобы купить или продлить подписку скопируйте это сообщение и отправьте @greenvpnoutline_admin\n'
+        f'Ваш ID: {user.id}'
+    )
+
+# Купить callback
+@router.callback_query(lambda c: c.data and c.data == 'buy_action')
+async def handle_buy_callback(callback: CallbackQuery) -> None:
+    if callback.from_user is None:
+        return
+
+    user, is_new = await get_user(
+        telegram_id=callback.from_user.id,
+        username=callback.from_user.username,
+        first_name=callback.from_user.first_name,
+        last_name=callback.from_user.last_name,
+    )
+
+    await callback.message.answer(
+        'Тарифы\n\n'
+        f'1 Месяц: 500'
+        f'3 Месяца: 1400'
+        f'6 Месяцев: 2700'
+        f'12 Месяцев: 5100'
+    )
+    await callback.message.answer(
+        'Чтобы купить или продлить подписку скопируйте это сообщение и отправьте @greenvpnoutline_admin\n'
+        f'Ваш ID: {user.id}'
+    )
 
 # Профиль
 @router.message(Command(commands=["profile"]))

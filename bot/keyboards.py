@@ -21,13 +21,13 @@ async def profile_payed_inline_keyboard(change_location=False, outline_server_ke
         keyboard.add(InlineKeyboardButton(text=get_access_key_button_text, callback_data="get_access_key"))
     if change_location:
         keyboard.add(InlineKeyboardButton(text=change_server_text, callback_data="cities"))
-    keyboard.add(InlineKeyboardButton(text=pay_button_text, callback_data="pay_action"))
+    keyboard.add(InlineKeyboardButton(text=pay_button_text, callback_data="buy_action"))
     return keyboard.adjust(1).as_markup()
 
 async def profile_not_payed_inline_keyboard():
     keyboard = InlineKeyboardBuilder()
     pay_button_text = 'Оформить подписку'
-    keyboard.add(InlineKeyboardButton(text=pay_button_text, callback_data=f"pay_action"))
+    keyboard.add(InlineKeyboardButton(text=pay_button_text, callback_data=f"buy_action"))
     return keyboard.adjust(1).as_markup()
 
 async def available_cities_buttons(cities):

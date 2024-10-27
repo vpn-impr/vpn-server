@@ -74,7 +74,7 @@ def get_can_change_location_by_key(key_id):
 def get_access_key(key_id):
     if key_id is None:
         return None
-    access_key = OutlineServerKey.objects.get(id=key_id).access_key
+    access_key = OutlineServerKey.objects.get(id=key_id)
     return access_key
 
 @sync_to_async
