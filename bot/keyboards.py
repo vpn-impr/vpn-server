@@ -35,3 +35,12 @@ async def available_cities_buttons(cities):
     async for city in cities:
         keyboard.add(InlineKeyboardButton(text=f'{city.dynamic_name}', callback_data=f"get_city_{city.id}"))
     return keyboard.adjust(1).as_markup()
+
+async def download_outline_inline_keyboard():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.add(InlineKeyboardButton(text='Скачать для iPhone', url='https://apps.apple.com/us/app/outline-app/id1356177741'))
+    keyboard.add(InlineKeyboardButton(text='Скачать для MacOS', url='https://apps.apple.com/us/app/outline-app/id1356178125'))
+    keyboard.add(InlineKeyboardButton(text='Скачать для Android', url='https://play.google.com/store/apps/details?id=org.outline.android.client'))
+    keyboard.add(InlineKeyboardButton(text='Скачать для Android (.apk)', url='https://s3.amazonaws.com/outline-releases/client/android/stable/Outline-Client.apk'))
+    keyboard.add(InlineKeyboardButton(text='Скачать для Windows', url='https://s3.amazonaws.com/outline-releases/client/windows/stable/Outline-Client.exe'))
+    return keyboard.adjust(2).as_markup()

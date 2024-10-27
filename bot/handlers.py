@@ -6,7 +6,7 @@ from aiogram.filters import Command
 from django.utils.regex_helper import contains
 
 from bot.keyboards import servers_buttons, profile_payed_inline_keyboard, profile_not_payed_inline_keyboard, \
-    available_cities_buttons
+    available_cities_buttons, download_outline_inline_keyboard
 from core.servers.utils import get_server_name_by_key, \
     get_can_change_location_by_key, get_access_key, get_available_countries, get_available_cities, change_user_city, \
     get_ssconf
@@ -226,3 +226,31 @@ async def handle_get_city_callback(callback: CallbackQuery) -> None:
         await callback.message.edit_reply_markup(reply_markup=None)
     else:
         await callback.message.answer(f'Не удалось сменить локацию: {_}')
+
+
+
+
+# Как настроить
+@router.message(Command(commands=["setup"]))
+async def handle_setup_command(message: Message) -> None:
+    if message.from_user is None:
+        return
+
+    user, is_new = await get_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
+    reply_markup = await download_outline_inline_keyboard()
+
+    await message.answer(
+        '<b>Как настроить Dance VPN</b>\n\n'
+        'Green VPN настраивается буквально в два-три клика.\n\n'
+        'Нужно скачать приложение Outline, оно есть на любой системе (Android, iOS, Windows, MacOS).\n'
+        'Ссылки для скачивания мы прикрепили внизу этого сообщения.\n\n'
+        'После этого мы пришлём ссылку, в которой содержится уникальный ключ. Если Outline уже установлен, то при переходе по ссылке, ключ применится автоматически и VPN заработает).\n\n'
+        'Если что-то в процессе не получится или у останутся вопросы, в любое время можно написать админу @greenvpnoutline_admin .\n\n',
+        reply_markup=reply_markup
+    )
