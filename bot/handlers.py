@@ -274,6 +274,7 @@ async def handle_images(message: Message) -> None:
     if message.from_user is None:
         return
     # Загружаем водяной знак
+    outputs = []
     async with aiohttp.ClientSession() as session:
         watermark = await download_image(session, WATERMARK_URL)
 
@@ -288,6 +289,7 @@ async def handle_images(message: Message) -> None:
             file = await download_image_as_pil(file_id, message.bot)
             try:
                 image_with_watermark = apply_watermark(file, watermark)
+                file.close()
 
                 # Сохраняем изображение с водяным знаком в байтовый поток
                 output = BytesIO()
@@ -298,6 +300,7 @@ async def handle_images(message: Message) -> None:
                     types.InputMediaPhoto(
                         media=BufferedInputFile(output.getvalue(), filename="image_with_watermark.jpg"))
                 )
+                outputs.append(output)
 
             except Exception as e:
                 await message.answer(f"Ошибка при обработке изображения: {str(e)}")
@@ -308,6 +311,8 @@ async def handle_images(message: Message) -> None:
             for i in range(0, len(image_buffers), batch_size):
                 media_group = image_buffers[i:i + batch_size]
                 await message.answer_media_group(media_group)
+    for output in outputs:
+        output.close()
 
 
 # Выгрузка фото с myhome.ge
@@ -326,6 +331,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
         return
 
     data = await aget_realty_data_by_id(mid)
+    outputs = []
 
     async with aiohttp.ClientSession() as session:
         # Загружаем водяной знак
@@ -336,6 +342,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
             try:
                 image = await download_image(session, image_url)
                 image_with_watermark = apply_watermark(image, watermark)
+                image.close()
 
                 # Сохраняем изображение в буфер
                 output = BytesIO()
@@ -345,6 +352,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
                 image_buffers.append(
                     InputMediaPhoto(media=BufferedInputFile(output.getvalue(), filename=f"image_{i + 1}.jpg"))
                 )
+                outputs.append(output)
             except Exception as e:
                 await message.answer(f"Ошибка при обработке изображения: {str(e)}")
 
@@ -355,3 +363,6 @@ async def handle_myhome_get_image_command(message: Message) -> None:
             for file in image_buffers[i:i + batch_size]:
                 media_group.append(file)
             await message.answer_media_group(media_group)
+
+    for output in outputs:
+        output.close()

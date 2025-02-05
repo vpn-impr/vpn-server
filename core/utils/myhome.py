@@ -30,24 +30,15 @@ async def download_image_as_pil(file_id: str, bot):
 
 def apply_watermark(image, watermark: Image.Image) -> Image.Image:
     if isinstance(image, BytesIO):
-        print('aaa999')
         image = Image.open(image)
-        print('aaa888')
-
-    """Накладывает водяной знак на изображение."""
-    #watermark = watermark.resize((int(image.width * 0.3), int(image.height * 0.3)), Image.ANTIALIAS)
-    #position = (image.width - watermark.width - 10, image.height - watermark.height - 10)
 
     position = (
         (image.width - watermark.width) // 2,
         (image.height - watermark.height) // 2,
     )
-    print('aaa777')
 
     image_with_watermark = image.copy()
     image_with_watermark.paste(watermark, position, watermark)
-    print('aaa666')
-
     return image_with_watermark
 
 def get_realty_data_by_id(self, id):
