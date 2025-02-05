@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import brotli
 from aiofiles.os import access
 from aiogram import Router
+from aiogram.enums.content_type import ContentType
 from aiogram.filters import Command
 from django.utils.regex_helper import contains
 
@@ -24,12 +25,12 @@ from aiogram import types
 
 import re
 
-from core.utils.myhome import aget_realty_data_by_id, download_image, apply_watermark
+from core.utils.myhome import aget_realty_data_by_id, download_image, apply_watermark, download_image_as_pil
 
 router = Router()
 router.message
 
-WATERMARK_URL = 'https://storage.yandexcloud.net/s3r.aurora-estate.ge/locahost-other/RostomashviliHouse.png'
+WATERMARK_URL = 'https://storage.yandexcloud.net/s3r.aurora-estate.ge/locahost-other/RostomashviliHouse_60.png'
 
 
 @router.message(Command(commands=["start"]))
@@ -267,6 +268,48 @@ async def handle_setup_command(message: Message) -> None:
         reply_markup=reply_markup
     )
 
+# Обработчик для получения фото
+@router.message(F.photo)
+async def handle_images(message: Message) -> None:
+    if message.from_user is None:
+        return
+    # Загружаем водяной знак
+    async with aiohttp.ClientSession() as session:
+        watermark = await download_image(session, WATERMARK_URL)
+
+        # Список для хранения обработанных изображений
+        image_buffers = []
+        # Проверяем, если это одиночное изображение
+        if message.photo:
+            #print(message.photo)
+            photo = message.photo[-1]  # Берем самое качественное фото
+            # Получаем ID файла фотографии
+            file_id = photo.file_id
+            file = await download_image_as_pil(file_id, message.bot)
+            try:
+                image_with_watermark = apply_watermark(file, watermark)
+
+                # Сохраняем изображение с водяным знаком в байтовый поток
+                output = BytesIO()
+                image_with_watermark.save(output, format="JPEG")
+                output.seek(0)
+
+                image_buffers.append(
+                    types.InputMediaPhoto(
+                        media=BufferedInputFile(output.getvalue(), filename="image_with_watermark.jpg"))
+                )
+
+            except Exception as e:
+                await message.answer(f"Ошибка при обработке изображения: {str(e)}")
+
+        # Если есть обработанные изображения, отправляем их обратно
+        if image_buffers:
+            batch_size = 10  # Отправляем не более 10 изображений за раз
+            for i in range(0, len(image_buffers), batch_size):
+                media_group = image_buffers[i:i + batch_size]
+                await message.answer_media_group(media_group)
+
+
 # Выгрузка фото с myhome.ge
 @router.message()
 async def handle_myhome_get_image_command(message: Message) -> None:
@@ -296,7 +339,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
 
                 # Сохраняем изображение в буфер
                 output = BytesIO()
-                image_with_watermark.save(output, format="JPEG", quality=85)
+                image_with_watermark.save(output, format="JPEG")
                 output.seek(0)
 
                 image_buffers.append(

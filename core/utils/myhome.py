@@ -11,7 +11,29 @@ async def download_image(session: aiohttp.ClientSession, url: str) -> Image.Imag
         return Image.open(BytesIO(image_bytes))
 
 
-def apply_watermark(image: Image.Image, watermark: Image.Image) -> Image.Image:
+async def download_image_as_pil(file_id: str, bot):
+    # Получаем информацию о файле
+    file = await bot.get_file(file_id)
+
+    # Формируем URL для скачивания файла
+    file_url = f"https://api.telegram.org/file/bot{bot.token}/{file.file_path}"
+
+    # Скачиваем изображение через aiohttp
+    async with aiohttp.ClientSession() as session:
+        async with session.get(file_url) as resp:
+            file_content = await resp.read()
+
+    # Преобразуем байты в изображение с помощью PIL
+    bt = BytesIO(file_content)
+
+    return bt
+
+def apply_watermark(image, watermark: Image.Image) -> Image.Image:
+    if isinstance(image, BytesIO):
+        print('aaa999')
+        image = Image.open(image)
+        print('aaa888')
+
     """Накладывает водяной знак на изображение."""
     #watermark = watermark.resize((int(image.width * 0.3), int(image.height * 0.3)), Image.ANTIALIAS)
     #position = (image.width - watermark.width - 10, image.height - watermark.height - 10)
@@ -20,9 +42,11 @@ def apply_watermark(image: Image.Image, watermark: Image.Image) -> Image.Image:
         (image.width - watermark.width) // 2,
         (image.height - watermark.height) // 2,
     )
+    print('aaa777')
 
     image_with_watermark = image.copy()
     image_with_watermark.paste(watermark, position, watermark)
+    print('aaa666')
 
     return image_with_watermark
 
