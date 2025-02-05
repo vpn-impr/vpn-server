@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+import brotli
 from aiofiles.os import access
 from aiogram import Router
 from aiogram.filters import Command
@@ -11,14 +12,72 @@ from core.servers.utils import get_server_name_by_key, \
     get_can_change_location_by_key, get_access_key, get_available_countries, get_available_cities, change_user_city, \
     get_ssconf
 from core.users.utils import get_user
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, BufferedInputFile, InputMediaPhoto
 from aiogram import F
 
 from core.utils.datetimes import get_now
+from PIL import Image, ImageDraw
+from io import BytesIO
+import aiohttp
+from aiogram.types import FSInputFile
+from aiogram import types
+
+import re
+
+from core.utils.myhome import aget_realty_data_by_id, download_image, apply_watermark
 
 router = Router()
 router.message
 
+WATERMARK_URL = 'https://storage.yandexcloud.net/s3r.aurora-estate.ge/locahost-other/RostomashviliHouse.png'
+
+
+
+# Выгрузка фото с myhome.ge
+@router.message()
+async def handle_myhome_get_image_command(message: Message) -> None:
+    if message.from_user is None:
+        return
+
+    text = message.text
+
+    pattern = r"https?://(?:www\.)?myhome\.ge/(?:[a-z]{2}/)?pr/(\d+)/"
+    match = re.match(pattern, text)
+    mid = match.group(1) if match else None
+    if mid is None:
+        await message.answer(f"Не понимаю вас")
+        return
+
+    data = await aget_realty_data_by_id(mid)
+
+    async with aiohttp.ClientSession() as session:
+        # Загружаем водяной знак
+        watermark = await download_image(session, WATERMARK_URL)
+
+        image_buffers = []
+        for i, image_url in enumerate(data["images_links"]):
+            try:
+                image = await download_image(session, image_url)
+                image_with_watermark = apply_watermark(image, watermark)
+
+                # Сохраняем изображение в буфер
+                output = BytesIO()
+                image_with_watermark.save(output, format="JPEG", quality=85)
+                output.seek(0)
+
+                image_buffers.append(
+                    InputMediaPhoto(media=BufferedInputFile(output.getvalue(), filename=f"image_{i + 1}.jpg"))
+                )
+            except Exception as e:
+                await message.answer(f"Ошибка при обработке изображения: {str(e)}")
+
+        # Отправляем изображения группами по 10 файлов
+        batch_size = 10
+        for i in range(0, len(image_buffers), batch_size):
+            media_group = []
+            for file in image_buffers[i:i + batch_size]:
+                media_group.append(file)
+            await message.answer_media_group(media_group)
 
 @router.message(Command(commands=["start"]))
 async def handle_start_command(message: Message) -> None:

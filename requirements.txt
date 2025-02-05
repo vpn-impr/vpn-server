@@ -23,3 +23,5 @@ colorlog==6.8.2
 python-dotenv==1.0.0
 structlog==24.4.0
 outline-api==0.0.6
+Pillow==10.3.0
+brotli==1.1.0
