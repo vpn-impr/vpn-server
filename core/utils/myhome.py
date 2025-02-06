@@ -28,9 +28,22 @@ async def download_image_as_pil(file_id: str, bot):
 
     return bt
 
-def apply_watermark(image, watermark: Image.Image) -> Image.Image:
+def apply_watermark(image, watermark: Image.Image, little) -> Image.Image:
     if isinstance(image, BytesIO):
         image = Image.open(image)
+
+    if little:
+        # Коэффициент изменения размера водяного знака на основе разрешения изображения
+        max_dimension = max(image.width, image.height)
+        scaling_factor = min(1, max_dimension / 1000)  # Для маленьких изображений уменьшаем водяной знак
+
+        # Изменение размера водяного знака, если необходимо
+        if scaling_factor < 1:
+            new_size = (
+                int(watermark.width * scaling_factor),
+                int(watermark.height * scaling_factor)
+            )
+            watermark = watermark.resize(new_size)
 
     position = (
         (image.width - watermark.width) // 2,

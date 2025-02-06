@@ -323,46 +323,62 @@ async def handle_myhome_get_image_command(message: Message) -> None:
 
     text = message.text
 
-    pattern = r"https?://(?:www\.)?myhome\.ge/(?:[a-z]{2}/)?pr/(\d+)/"
-    match = re.match(pattern, text)
-    mid = match.group(1) if match else None
-    if mid is None:
+    if 'myhome.ge' in text:
+
+        link = text.split(' ')[0]
+
+        little = False
+        need_orig = False
+        if ' мал' in text:
+            little = True
+        if ' ориг' in text:
+            need_orig = True
+
+        pattern = r"https?://(?:www\.)?myhome\.ge/(?:[a-z]{2}/)?pr/(\d+)/"
+        match = re.match(pattern, link)
+        mid = match.group(1) if match else None
+        if mid is None:
+            await message.answer(f"Не понимаю вас")
+            return
+
+        data = await aget_realty_data_by_id(mid)
+        outputs = []
+
+        async with aiohttp.ClientSession() as session:
+            # Загружаем водяной знак
+            watermark = await download_image(session, WATERMARK_URL)
+
+            image_buffers = []
+            for i, image_url in enumerate(data["images_links"]):
+                try:
+                    image = await download_image(session, image_url)
+                    if not need_orig:
+                        image_with_watermark = apply_watermark(image, watermark, little)
+                    else:
+                        image_with_watermark = image
+
+                    # Сохраняем изображение в буфер
+                    output = BytesIO()
+                    image_with_watermark.save(output, format="JPEG")
+                    output.seek(0)
+
+                    image_buffers.append(
+                        InputMediaPhoto(media=BufferedInputFile(output.getvalue(), filename=f"image_{i + 1}.jpg"))
+                    )
+                    outputs.append(output)
+                    image.close()
+                except Exception as e:
+                    await message.answer(f"Ошибка при обработке изображения: {str(e)}")
+
+            # Отправляем изображения группами по 10 файлов
+            batch_size = 10
+            for i in range(0, len(image_buffers), batch_size):
+                media_group = []
+                for file in image_buffers[i:i + batch_size]:
+                    media_group.append(file)
+                await message.answer_media_group(media_group)
+
+        for output in outputs:
+            output.close()
+    else:
         await message.answer(f"Не понимаю вас")
-        return
-
-    data = await aget_realty_data_by_id(mid)
-    outputs = []
-
-    async with aiohttp.ClientSession() as session:
-        # Загружаем водяной знак
-        watermark = await download_image(session, WATERMARK_URL)
-
-        image_buffers = []
-        for i, image_url in enumerate(data["images_links"]):
-            try:
-                image = await download_image(session, image_url)
-                image_with_watermark = apply_watermark(image, watermark)
-                image.close()
-
-                # Сохраняем изображение в буфер
-                output = BytesIO()
-                image_with_watermark.save(output, format="JPEG")
-                output.seek(0)
-
-                image_buffers.append(
-                    InputMediaPhoto(media=BufferedInputFile(output.getvalue(), filename=f"image_{i + 1}.jpg"))
-                )
-                outputs.append(output)
-            except Exception as e:
-                await message.answer(f"Ошибка при обработке изображения: {str(e)}")
-
-        # Отправляем изображения группами по 10 файлов
-        batch_size = 10
-        for i in range(0, len(image_buffers), batch_size):
-            media_group = []
-            for file in image_buffers[i:i + batch_size]:
-                media_group.append(file)
-            await message.answer_media_group(media_group)
-
-    for output in outputs:
-        output.close()
