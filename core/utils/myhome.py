@@ -28,7 +28,7 @@ async def download_image_as_pil(file_id: str, bot):
 
     return bt
 
-def apply_watermark(image, watermark: Image.Image, little) -> Image.Image:
+def apply_watermark(image, watermark: Image.Image, little=False) -> Image.Image:
     if isinstance(image, BytesIO):
         image = Image.open(image)
 
