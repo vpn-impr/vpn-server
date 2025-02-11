@@ -349,39 +349,42 @@ async def handle_myhome_get_image_command(message: Message) -> None:
         data = await aget_realty_data_by_id(mid)
         outputs = []
 
-        async with aiohttp.ClientSession() as session:
-            # Загружаем водяной знак
-            watermark = await download_image(session, WATERMARK_URL)
+        try:
+            async with aiohttp.ClientSession() as session:
+                # Загружаем водяной знак
+                watermark = await download_image(session, WATERMARK_URL)
 
-            image_buffers = []
-            for i, image_url in enumerate(data["images_links"]):
-                try:
-                    image = await download_image(session, image_url)
-                    if not need_orig:
-                        image_with_watermark = apply_watermark(image, watermark, little)
-                    else:
-                        image_with_watermark = image
+                image_buffers = []
+                for i, image_url in enumerate(data["images_links"]):
+                    try:
+                        image = await download_image(session, image_url)
+                        if not need_orig:
+                            image_with_watermark = apply_watermark(image, watermark, little)
+                        else:
+                            image_with_watermark = image
 
-                    # Сохраняем изображение в буфер
-                    output = BytesIO()
-                    image_with_watermark.save(output, format="JPEG")
-                    output.seek(0)
+                        # Сохраняем изображение в буфер
+                        output = BytesIO()
+                        image_with_watermark.save(output, format="JPEG")
+                        output.seek(0)
 
-                    image_buffers.append(
-                        InputMediaPhoto(media=BufferedInputFile(output.getvalue(), filename=f"image_{i + 1}.jpg"))
-                    )
-                    outputs.append(output)
-                    image.close()
-                except Exception as e:
-                    await message.answer(f"Ошибка при обработке изображения: {str(e)}")
+                        image_buffers.append(
+                            InputMediaPhoto(media=BufferedInputFile(output.getvalue(), filename=f"image_{i + 1}.jpg"))
+                        )
+                        outputs.append(output)
+                        image.close()
+                    except Exception as e:
+                        await message.answer(f"Ошибка при обработке изображения: {str(e)}")
 
-            # Отправляем изображения группами по 10 файлов
-            batch_size = 10
-            for i in range(0, len(image_buffers), batch_size):
-                media_group = []
-                for file in image_buffers[i:i + batch_size]:
-                    media_group.append(file)
-                await message.answer_media_group(media_group)
+                # Отправляем изображения группами по 10 файлов
+                batch_size = 10
+                for i in range(0, len(image_buffers), batch_size):
+                    media_group = []
+                    for file in image_buffers[i:i + batch_size]:
+                        media_group.append(file)
+                    await message.answer_media_group(media_group)
+        except Exception as e:
+            await message.answer(f"Не удалось получить фото: {str(e)}")
         for output in outputs:
             output.close()
         if need_add_to_db:
