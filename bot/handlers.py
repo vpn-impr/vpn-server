@@ -385,17 +385,18 @@ async def handle_myhome_get_image_command(message: Message) -> None:
         for output in outputs:
             output.close()
         if need_add_to_db:
-            await message.answer("Добавляем в систему")
-            url_aur = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve/'
-            headers = {'Authorization': 'Token f4254f25dde331cac97959872d614eaaef7ca2a2'}
-            try:
-                async with session.post(url_aur, headers=headers, data={'myhome_id': str(mid)}) as response:
-                    if response.ok:
-                        await message.answer("Запрос на одобрение отправлен.")
-                    else:
-                        error_text = await response.text()
-                        await message.answer(f"Ошибка: {error_text}")
-            except Exception as e:
-                await message.answer(f"Ошибка запроса: {str(e)}")
+            async with aiohttp.ClientSession() as session:
+                await message.answer("Добавляем в систему")
+                url_aur = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve/'
+                headers = {'Authorization': 'Token f4254f25dde331cac97959872d614eaaef7ca2a2'}
+                try:
+                    async with session.post(url_aur, headers=headers, data={'myhome_id': str(mid)}) as response:
+                        if response.ok:
+                            await message.answer("Запрос на одобрение отправлен.")
+                        else:
+                            error_text = await response.text()
+                            await message.answer(f"Ошибка: {error_text}")
+                except Exception as e:
+                    await message.answer(f"Ошибка запроса: {str(e)}")
     else:
         await message.answer(f"Не понимаю вас")
