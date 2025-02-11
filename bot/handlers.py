@@ -389,7 +389,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
                 url_aur = 'https://api.rem.aurora-estate.ge/v1/pre_approve_by_myhome/approve/'
                 headers = {'Authorization': 'Token f4254f25dde331cac97959872d614eaaef7ca2a2'}
                 try:
-                    async with session.post(url_aur, headers=headers, data={'myhome_id': str(mid)}) as response:
+                    async with session.post(url_aur, headers=headers, json={'myhome_id': str(mid)}) as response:
                         if response.ok:
                             await message.answer("Запрос на одобрение отправлен.")
                         else:
