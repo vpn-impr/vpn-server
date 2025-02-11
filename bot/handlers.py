@@ -321,7 +321,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
     if message.from_user is None:
         return
 
-    text = message.text
+    text = message.text.lower()
 
     if 'myhome.ge' in text:
 
@@ -329,10 +329,13 @@ async def handle_myhome_get_image_command(message: Message) -> None:
 
         little = False
         need_orig = False
+        need_add_to_db = False
         if ' мал' in text:
             little = True
         if ' ориг' in text:
             need_orig = True
+        if text.startswith('добавить'):
+            need_add_to_db = True
 
         pattern = r"https?://(?:www\.)?myhome\.ge/(?:[a-z]{2}/)?pr/(\d+)/"
         match = re.match(pattern, link)
@@ -377,8 +380,15 @@ async def handle_myhome_get_image_command(message: Message) -> None:
                 for file in image_buffers[i:i + batch_size]:
                     media_group.append(file)
                 await message.answer_media_group(media_group)
-
         for output in outputs:
             output.close()
+        if need_add_to_db:
+            async with aiohttp.ClientSession() as session:
+                url = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve'
+                async with session.post(url, data={'myhome_id': str(mid)}) as response:
+                    if response.status == 200:
+                        await message.answer(f"Запрос на одобрение отправлен.")
+                    else:
+                        await message.answer(f"Ошибка: {response.json()}")
     else:
         await message.answer(f"Не понимаю вас")
