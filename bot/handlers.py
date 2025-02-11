@@ -346,10 +346,11 @@ async def handle_myhome_get_image_command(message: Message) -> None:
             await message.answer(f"Не понимаю вас")
             return
 
-        data = await aget_realty_data_by_id(mid)
+
         outputs = []
 
         try:
+            data = await aget_realty_data_by_id(mid)
             async with aiohttp.ClientSession() as session:
                 # Загружаем водяной знак
                 watermark = await download_image(session, WATERMARK_URL)
