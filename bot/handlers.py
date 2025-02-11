@@ -385,12 +385,16 @@ async def handle_myhome_get_image_command(message: Message) -> None:
         for output in outputs:
             output.close()
         if need_add_to_db:
-            async with aiohttp.ClientSession() as session:
-                url = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve'
-                async with session.post(url, data={'myhome_id': str(mid)}) as response:
-                    if response.status == 200:
-                        await message.answer(f"Запрос на одобрение отправлен.")
+            url_aur = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve/'
+            headers = {'Authorization': 'Token f4254f25dde331cac97959872d614eaaef7ca2a2'}
+            try:
+                async with session.post(url_aur, headers=headers, data={'myhome_id': str(mid)}) as response:
+                    if response.ok:
+                        await message.answer("Запрос на одобрение отправлен.")
                     else:
-                        await message.answer(f"Ошибка: {response.json()}")
+                        error_text = await response.text()
+                        await message.answer(f"Ошибка: {error_text}")
+            except aiohttp.ClientError as e:
+                await message.answer(f"Ошибка запроса: {str(e)}")
     else:
         await message.answer(f"Не понимаю вас")
