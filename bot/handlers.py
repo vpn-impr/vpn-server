@@ -325,7 +325,9 @@ async def handle_myhome_get_image_command(message: Message) -> None:
 
     if 'myhome.ge' in text:
 
-        link = text.split(' ')[0]
+        for i in text.split(' '):
+            if 'myhome.ge' in i:
+                link = i
 
         little = False
         need_orig = False
@@ -334,7 +336,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
             little = True
         if ' ориг' in text:
             need_orig = True
-        if text.startswith('добавить'):
+        if ' добав' in text:
             need_add_to_db = True
 
         pattern = r"https?://(?:www\.)?myhome\.ge/(?:[a-z]{2}/)?pr/(\d+)/"
