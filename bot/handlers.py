@@ -386,7 +386,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
             output.close()
         if need_add_to_db:
             async with aiohttp.ClientSession() as session:
-                url_aur = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve/'
+                url_aur = 'https://api.rem.aurora-estate.ge/v1/pre_approve_by_myhome/approve/'
                 headers = {'Authorization': 'Token f4254f25dde331cac97959872d614eaaef7ca2a2'}
                 try:
                     async with session.post(url_aur, headers=headers, data={'myhome_id': str(mid)}) as response:
