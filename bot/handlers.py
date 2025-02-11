@@ -385,6 +385,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
         for output in outputs:
             output.close()
         if need_add_to_db:
+            await message.answer("Добавляем в систему")
             url_aur = 'https://api.rem.auora-estate.ge/v1/pre_approve_by_myhome/approve/'
             headers = {'Authorization': 'Token f4254f25dde331cac97959872d614eaaef7ca2a2'}
             try:
@@ -394,7 +395,7 @@ async def handle_myhome_get_image_command(message: Message) -> None:
                     else:
                         error_text = await response.text()
                         await message.answer(f"Ошибка: {error_text}")
-            except aiohttp.ClientError as e:
+            except Exception as e:
                 await message.answer(f"Ошибка запроса: {str(e)}")
     else:
         await message.answer(f"Не понимаю вас")
