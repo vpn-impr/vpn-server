@@ -92,7 +92,7 @@ async def aget_realty_data_by_id(id) -> dict:
 
     async with session.get(url) as response:
         rdata = (await response.json())['data']['statement']
-        images_links = [item['image']['thumb'] for item in rdata['gallery']]
+        images_links = [item['image']['thumb_webp'] for item in rdata['gallery']]
         await session.close()
         return {
             'myhome_id': str(rdata['id']),
